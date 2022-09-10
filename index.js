@@ -9,6 +9,7 @@ const fs = require("fs")
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use("/", express.static(__dirname + "/public"));
 
 const db = mysql.createConnection({
   user: "root",
@@ -59,6 +60,28 @@ app.get('/save', async (req, res) => {
 // res.send(req.query)
 
 // });
+
+//只撈一筆//
+app.get("/view",(req, res) => {
+  
+  db.query("SELECT * FROM `picture` ORDER BY `picture`.`id` DESC",(err,result)=>{
+    if(err){
+      console.log(err);
+    } else{
+      res.send(result)
+    }
+  })
+  
+})
+
+app.get("/see", upload.none(), async (req, res) => {
+
+
+  const sql = "SELECT * FROM `picture`";
+  const [r] = await db.query(sql);
+  console.log(r)
+  res.json(r)
+});
 
 app.listen(3001, () => {
   console.log("run 3001")
