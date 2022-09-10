@@ -3,8 +3,12 @@ const app = express();
 const mysql = require("mysql");
 const cors = require('cors');
 const upload = require('./modules/upload-images.js')
+const { v4: uuidv4 } = require('uuid');
+const fs = require("fs")
 
 app.use(cors());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 const db = mysql.createConnection({
   user: "root",
@@ -15,30 +19,30 @@ const db = mysql.createConnection({
 
 //存圖片//
 
-app.get('/upload', upload.none(), async (req, res) => {
+app.post('/upload', upload.none(), async (req, res) => {
   //接收base64
-  console.log(req.query)
-  // var imgData = req.body.imgData;
-  // const snapimgName = uuidv4()
+    // console.log(req.body.imgData)
+    var imgData = req.body.imgData;
+    const snapimgName = uuidv4()
   // //濾data:URL
-  // var base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
-  // var dataBuffer = new Buffer(base64Data, 'base64');
+  var base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
+  var dataBuffer = new Buffer(base64Data, 'base64');
 
 
-  // const screenShotImg = 'snap' + snapimgName + '.png';
+  const screenShotImg = 'snap' + snapimgName + '.png';
 
-  // const sql = "INSERT INTO `picture`(`screenShotImg`) VALUES (?)";
+  const sql = "INSERT INTO `picture`(`screenShotImg`) VALUES (?)";
 
-  // db.query(sql, [screenShotImg]);
+  db.query(sql, [screenShotImg]);
 
 
-  // fs.writeFile(`./public/${screenShotImg}`, dataBuffer, function (err) {
-  //   if (err) {
-  //     res.send(err);
-  //   } else {
-  //     res.send("saved");
-  //   }
-  // });
+  fs.writeFile(`./public/${screenShotImg}`, dataBuffer, function (err) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send("saved");
+    }
+  });
 });
 
 //存//
